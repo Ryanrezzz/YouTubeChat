@@ -4,5 +4,5 @@ langchain-text-splitters
 langchain-google-genai
 langchain-community
 faiss-cpu
-youtube-transcript-api
+supadata
 python-dotenv

@@ -3,11 +3,12 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 import streamlit as st
-from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
-from youtube_transcript_api.proxies import GenericProxyConfig 
+from supadata import Supadata
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.chat_message_histories import ChatMessageHistory
 from main import get_chain 
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(
     page_title='Chat With YouTube Video',
@@ -26,16 +27,12 @@ if 'messages' not in st.session_state:
 url = st.text_input('Enter video url')
 
 if url and st.button("Load Video"):
-    video_id = url.split("v=")[1].split("&")[0]
     try:
-        with st.spinner("⏳ Loading transcript & building vector store..."):  # ← add this
-            proxy_url = os.getenv("PROXY_URL") or st.secrets.get("PROXY_URL", None)
-            if proxy_url:
-                ytt_api = YouTubeTranscriptApi(proxy_config=GenericProxyConfig(http_url=proxy_url, https_url=proxy_url))
-            else:
-                ytt_api = YouTubeTranscriptApi()
-            transcript = ytt_api.fetch(video_id, languages=['hi', 'en', 'ur', 'es', 'fr', 'de', 'ja'])
-            transcript_text = " ".join(snippet.text for snippet in transcript)
+        with st.spinner("⏳ Loading transcript & building vector store..."):
+            api_key = os.getenv("SUPADATA_API_KEY") or st.secrets.get("SUPADATA_API_KEY", None)
+            supadata_client = Supadata(api_key=api_key)
+            transcript = supadata_client.transcript(url=url, text=True)
+            transcript_text = transcript.content
             splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             chunks = splitter.split_text(transcript_text)
             st.session_state.chain = get_chain(chunks)
@@ -44,8 +41,6 @@ if url and st.button("Load Video"):
             st.session_state.messages = []
             st.session_state.history = ChatMessageHistory()
         st.success("✅ Video loaded! Start asking questions.")
-    except TranscriptsDisabled:
-        st.error("❌ Transcripts are disabled for this video.")
     except Exception as e:
         st.error(f"❌ Error: {str(e)}")
         
