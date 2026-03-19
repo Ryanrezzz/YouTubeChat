@@ -24,21 +24,19 @@ def get_vector_store(chunks):
 
 def get_retriever(vector_store):
     retriever = vector_store.as_retriever(
-        search_kwargs={'k':4}
+        search_kwargs={'k':5}
     )
     return retriever
 
 #Prompt
 def get_prompt():
     prompts = ChatPromptTemplate([
-        ('system','You are a helpful assistant'),
+        ('system','You are a helpful assistant that answers questions based on YouTube video transcripts. Use the provided context to answer. If the answer is truly not in the context, say so.'),
         ('placeholder','{chat_history}'),
-        ('human',''' You are a helpful assistant.
-      Answer ONLY from the provided transcript context.
-      If the context is insufficient, just say you don't know.
+        ('human','''Context from transcript:
+{context}
 
-      {context}
-      Question: {question}''')
+Question: {question}''')
     ])
     return prompts
 
@@ -46,7 +44,8 @@ def get_prompt():
 def get_llm():
     model = ChatGoogleGenerativeAI(
         model='gemini-2.5-flash',
-        temperature=0.7
+        temperature=0.7,
+        max_output_tokens=400
     )
     return model
 
