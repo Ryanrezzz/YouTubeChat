@@ -32,7 +32,12 @@ if url and st.button("Load Video"):
             api_key = os.getenv("SUPADATA_API_KEY") or st.secrets.get("SUPADATA_API_KEY", None)
             supadata_client = Supadata(api_key=api_key)
             transcript = supadata_client.transcript(url=url, text=True)
-            transcript_text = transcript.content
+            if isinstance(transcript, str):
+                transcript_text = transcript
+            elif hasattr(transcript, 'content'):
+                transcript_text = transcript.content
+            else:
+                raise ValueError(f"Unexpected transcript response type: {type(transcript)}. The video may not have a transcript available.")
             splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
             chunks = splitter.split_text(transcript_text)
             st.session_state.chain = get_chain(chunks)

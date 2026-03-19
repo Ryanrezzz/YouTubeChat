@@ -72,7 +72,10 @@ def get_chain(chunks):
 
 if __name__ == "__main__":
     Url = input("Enter video link: ")
-    video_id = Url.split("v=")[1].split("&")[0]
+    if "youtu.be/" in Url:
+        video_id = Url.split("youtu.be/")[1].split("?")[0]
+    else:
+        video_id = Url.split("v=")[1].split("&")[0]
 
     try:
         transcript = YouTubeTranscriptApi().fetch(video_id)
