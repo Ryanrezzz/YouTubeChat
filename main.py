@@ -3,7 +3,8 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_google_genai import GoogleGenerativeAIEmbeddings,ChatGoogleGenerativeAI
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_groq import ChatGroq
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
@@ -42,10 +43,10 @@ Question: {question}''')
 
 #LLM 
 def get_llm():
-    model = ChatGoogleGenerativeAI(
-        model='gemini-2.5-flash',
+    model = ChatGroq(
+        model='llama-3.3-70b-versatile',
         temperature=0.7,
-        max_output_tokens=400
+        max_tokens=600
     )
     return model
 
