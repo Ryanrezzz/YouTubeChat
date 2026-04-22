@@ -16,7 +16,7 @@ load_dotenv()
 #Vector Store
 
 def get_vector_store(chunks):
-    embedding = GoogleGenerativeAIEmbeddings(model='gemini-embedding-2-preview')
+    embedding = GoogleGenerativeAIEmbeddings(model='gemini-embedding-001')
     vector_store = FAISS.from_texts(chunks,embedding)
     return vector_store
 
